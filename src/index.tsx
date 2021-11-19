@@ -92,6 +92,18 @@ export interface Props {
     | 'aspect-ratio-16/9'
     | 'aspect-ratio-4/3'
     | 'aspect-ratio-21/9';
+  /**
+   * Aria Label for play button
+   * 
+   * @default "Youtube player, play button. Press to play."
+   */
+  playButtonAriaLabel?: string;
+  /**
+   * Aria Label for player container
+   * 
+   * @default "Youtube player"
+   */
+  playContainerAriaLabel?: string;
 }
 
 /**
@@ -121,9 +133,13 @@ export const ReactYouTubeLite = ({
   playerClass = 'lty-playbtn',
   wrapperClass = 'ryt-lite embed-responsive',
   aspectRatio = 'aspect-ratio-16/9',
+  playButtonAriaLabel = 'Youtube player, play button. Press to play.',
+  playContainerAriaLabel = 'Youtube player',
 }: Props): JSX.Element => {
   const [preconnected, setPreconnected] = React.useState(false);
   const [iframe, setIframe] = React.useState(false);
+  const playButtonRef = React.useRef(null);
+  const videoContainerRef = React.useRef(null);
   const videoId = encodeURIComponent(getYoutubeId(url));
   const videoTitle = title;
   const posterUrl = `https://i.ytimg.com/vi/${videoId}/${poster}.jpg`;
@@ -173,15 +189,19 @@ export const ReactYouTubeLite = ({
         )}
       </>
       <div
+        ref={videoContainerRef}
         onPointerOver={warmConnections}
         onClick={addIframe}
+        onKeyPress={addIframe}
         className={`${wrapperClass} ${aspectRatio} ${
           iframe ? activatedClass : ''
         }`}
         data-title={videoTitle}
         style={{ backgroundImage: `url(${posterUrl})` }}
+        aria-label={playContainerAriaLabel}
+        tabIndex={0}
       >
-        <div className={playerClass}></div>
+        <div className={playerClass} ref={playButtonRef} aria-label={playButtonAriaLabel} tabIndex={0}></div>
         {iframe && (
           <iframe
             className={iframeClass}
